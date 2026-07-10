@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proyek — Imam</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #0a0a0f;
+  --bg2: #111118;
+  --bg3: #1a1a25;
+  --accent: #6c63ff;
+  --accent2: #ff6584;
+  --accent3: #43e97b;
+  --text: #f0eff8;
+  --muted: #8b8aa0;
+  --border: rgba(108,99,255,0.2);
+  --card: rgba(26,26,37,0.9);
+}
+
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Space Grotesk', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+  cursor: none;
+}
+
+.cursor { position: fixed; width: 12px; height: 12px; background: var(--accent); border-radius: 50%; pointer-events: none; z-index: 9999; mix-blend-mode: screen; transition: transform 0.1s; }
+.cursor-ring { position: fixed; width: 36px; height: 36px; border: 1.5px solid var(--accent); border-radius: 50%; pointer-events: none; z-index: 9998; opacity: 0.5; transition: all 0.18s; }
+
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: linear-gradient(rgba(108,99,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(108,99,255,0.04) 1px, transparent 1px);
+  background-size: 60px 60px;
+  z-index: 0; pointer-events: none;
+}
+
+.blob { position: fixed; border-radius: 50%; filter: blur(80px); pointer-events: none; z-index: 0; opacity: 0.06; }
+.blob1 { width: 500px; height: 500px; background: var(--accent); top: -150px; right: -100px; }
+.blob2 { width: 350px; height: 350px; background: var(--accent2); bottom: 10%; left: -80px; }
+.blob3 { width: 300px; height: 300px; background: var(--accent3); top: 50%; right: 10%; }
+
+/* NAV */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 1.25rem 4rem;
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  background: rgba(10,10,15,0.75);
+}
+.nav-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.3rem; color: var(--text); letter-spacing: -0.02em; text-decoration: none; }
+.nav-logo span { color: var(--accent); }
+.nav-links { display: flex; gap: 2.5rem; align-items: center; }
+.nav-links a { text-decoration: none; color: var(--muted); font-size: 0.875rem; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; transition: color 0.2s; }
+.nav-links a:hover, .nav-links a.active { color: var(--text); }
+.nav-links a.active { color: var(--accent); }
+.nav-cta { background: var(--accent) !important; color: #fff !important; padding: 0.5rem 1.25rem; border-radius: 50px; }
+
+/* PAGE HEADER */
+.page-header {
+  padding: 10rem 4rem 4rem;
+  position: relative; z-index: 1;
+  max-width: 900px;
+}
+.breadcrumb {
+  display: flex; align-items: center; gap: 0.5rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem; color: var(--muted);
+  margin-bottom: 1.5rem;
+}
+.breadcrumb a { color: var(--accent); text-decoration: none; }
+.breadcrumb a:hover { text-decoration: underline; }
+.breadcrumb-sep { opacity: 0.4; }
+.page-header h1 {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  margin-bottom: 1.25rem;
+}
+.page-header h1 em {
+  font-style: normal;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.page-header p { font-size: 1.05rem; color: var(--muted); line-height: 1.75; max-width: 560px; }
+
+/* FILTER BAR */
+.filter-bar {
+  position: relative; z-index: 1;
+  padding: 0 4rem 3rem;
+  display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;
+}
+.filter-label { font-size: 0.78rem; color: var(--muted); font-family: 'JetBrains Mono', monospace; margin-right: 0.5rem; }
+.filter-btn {
+  padding: 0.4rem 1rem;
+  border-radius: 50px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.8rem; font-weight: 500;
+  cursor: none;
+  transition: all 0.2s;
+}
+.filter-btn:hover, .filter-btn.active {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(108,99,255,0.1);
+}
+.filter-btn.active { color: #fff; background: var(--accent); border-color: var(--accent); }
+.project-count {
+  margin-left: auto;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+.project-count span { color: var(--accent); font-weight: 600; }
+
+/* PROJECTS GRID */
+.projects-wrap {
+  position: relative; z-index: 1;
+  padding: 0 4rem 6rem;
+}
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+}
+
+/* PROJECT CARD */
+.proj-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  overflow: hidden;
+  transition: transform 0.35s cubic-bezier(.22,.68,0,1.2), border-color 0.3s, box-shadow 0.3s;
+  opacity: 0; transform: translateY(40px);
+}
+.proj-card.visible { opacity: 1; transform: translateY(0); transition: opacity 0.6s ease, transform 0.6s ease, border-color 0.3s, box-shadow 0.3s; }
+.proj-card:hover { transform: translateY(-8px) scale(1.01); border-color: rgba(108,99,255,0.5); box-shadow: 0 24px 70px rgba(108,99,255,0.15); }
+.proj-card.featured { grid-column: span 2; }
+
+/* ══════════════════════════════
+   PROJECT IMAGE (screenshot thumbnails)
+   ══════════════════════════════ */
+.project-image {
+  position: relative;
+  width: 100%;
+  height: 280px;
+  overflow: hidden;
+  background:
+    linear-gradient(135deg, rgba(108,99,255,0.15), rgba(255,101,132,0.08)),
+    var(--bg3);
+  border-bottom: 1px solid var(--border);
+}
+.proj-card.featured .project-image { height: 340px; }
+
+.project-image img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  display: block;
+  transition: transform 0.6s cubic-bezier(.22,.68,0,1.2), filter 0.4s;
+  filter: saturate(1.02);
+}
+.proj-card:hover .project-image img {
+  transform: scale(1.06);
+}
+
+/* subtle top gradient so the browser-chrome edge of the screenshot doesn't look cut off */
+.project-image::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  box-shadow: inset 0 -60px 50px -50px rgba(10,10,15,0.55);
+}
+
+/* number/year badge floating on top of the image */
+.project-image::before {
+  content: '';
+}
+
+/* CARD INFO */
+.proj-info { padding: 1.75rem 2rem; }
+.proj-meta-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+.proj-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--muted);
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border);
+  padding: 0.25rem 0.65rem;
+  border-radius: 50px;
+}
+.proj-year {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--accent);
+}
+.proj-tags { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 0.85rem; }
+.tag {
+  font-size: 0.7rem;
+  font-family: 'JetBrains Mono', monospace;
+  padding: 0.2rem 0.65rem;
+  border-radius: 50px;
+  border: 1px solid;
+}
+.tag-php { color: #7b7cf7; border-color: rgba(123,124,247,0.35); background: rgba(123,124,247,0.08); }
+.tag-laravel { color: #fb503b; border-color: rgba(251,80,59,0.35); background: rgba(251,80,59,0.08); }
+.tag-flutter { color: #54c5f8; border-color: rgba(84,197,248,0.35); background: rgba(84,197,248,0.08); }
+.tag-js { color: #f7df1e; border-color: rgba(247,223,30,0.35); background: rgba(247,223,30,0.08); }
+.tag-mysql { color: #ff6584; border-color: rgba(255,101,132,0.35); background: rgba(255,101,132,0.08); }
+.tag-react { color: #61dafb; border-color: rgba(97,218,251,0.35); background: rgba(97,218,251,0.08); }
+.tag-node { color: #68a063; border-color: rgba(104,160,99,0.35); background: rgba(104,160,99,0.08); }
+.tag-firebase { color: #ffa000; border-color: rgba(255,160,0,0.35); background: rgba(255,160,0,0.08); }
+.tag-dart { color: #00b4ab; border-color: rgba(0,180,171,0.35); background: rgba(0,180,171,0.08); }
+.tag-tailwind { color: #38bdf8; border-color: rgba(56,189,248,0.35); background: rgba(56,189,248,0.08); }
+
+.proj-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.5rem;
+  color: var(--text);
+}
+.proj-title-sub {
+  font-size: 0.8rem;
+  color: var(--accent);
+  font-family: 'JetBrains Mono', monospace;
+  margin-bottom: 0.75rem;
+  display: flex; align-items: center; gap: 0.4rem;
+}
+.proj-desc {
+  font-size: 0.875rem;
+  color: var(--muted);
+  line-height: 1.75;
+  margin-bottom: 1.5rem;
+}
+
+.proj-divider { height: 1px; background: var(--border); margin-bottom: 1.25rem; }
+
+.proj-links-row { display: flex; justify-content: space-between; align-items: center; }
+.proj-links { display: flex; gap: 0.6rem; }
+.link-btn {
+  text-decoration: none;
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  font-size: 0.78rem; font-weight: 600;
+  padding: 0.45rem 1.1rem;
+  border-radius: 50px;
+  transition: all 0.2s;
+}
+.link-demo { background: var(--accent); color: #fff; box-shadow: 0 4px 20px rgba(108,99,255,0.3); }
+.link-demo:hover { box-shadow: 0 6px 28px rgba(108,99,255,0.5); transform: translateY(-1px); }
+.link-gh { border: 1px solid var(--border); color: var(--muted); }
+.link-gh:hover { border-color: rgba(255,255,255,0.3); color: var(--text); background: rgba(255,255,255,0.04); }
+.proj-status { display: flex; align-items: center; gap: 0.4rem; font-size: 0.72rem; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+.status-dot { width: 7px; height: 7px; border-radius: 50%; }
+.status-dot.live { background: var(--accent3); box-shadow: 0 0 6px var(--accent3); animation: pulse 1.5s infinite; }
+.status-dot.done { background: var(--muted); }
+
+@keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+
+/* BACK TO TOP */
+.back-btn {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  text-decoration: none;
+  color: var(--muted);
+  font-size: 0.85rem;
+  border: 1px solid var(--border);
+  padding: 0.6rem 1.25rem;
+  border-radius: 50px;
+  transition: all 0.2s;
+  position: relative; z-index: 1;
+  margin: 0 4rem 4rem;
+}
+.back-btn:hover { color: var(--text); border-color: rgba(255,255,255,0.25); background: rgba(255,255,255,0.04); }
+
+footer {
+  text-align: center;
+  padding: 2rem;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-family: 'JetBrains Mono', monospace;
+  position: relative; z-index: 1;
+}
+
+@media (max-width: 900px) {
+  .projects-grid { grid-template-columns: 1fr; }
+  .proj-card.featured { grid-column: span 1; }
+  .project-image, .proj-card.featured .project-image { height: 220px; }
+}
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursor-ring"></div>
+<div class="blob blob1"></div>
+<div class="blob blob2"></div>
+<div class="blob blob3"></div>
+
+ <!-- NAV -->
+        <nav>
+            <div class="nav-logo">Imam<span>.</span></div>
+            <div class="nav-links">
+                <a href="index.html">Beranda</a>
+                <a href="#projects">Proyek</a>
+                <a href="index.html#skills">Skills</a>
+                <a href="index.html#contact" class="nav-cta">Hubungi</a>
+            </div>
+        </nav>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <div class="breadcrumb">
+    <a href="index.html">Beranda</a>
+    <span class="breadcrumb-sep">/</span>
+    <span>Proyek</span>
+  </div>
+  <h1>Semua <em>Proyek</em><br>yang Pernah Dibuat</h1>
+  <p>Kumpulan proyek yang dikerjakan selama belajar di jurusan RPL — dari tugas sekolah, proyek PKL, sampai eksperimen iseng yang akhirnya jadi sesuatu.</p>
+</div>
+
+<!-- FILTER BAR -->
+<div class="filter-bar">
+  <span class="filter-label">filter:</span>
+  <button class="filter-btn active" onclick="filterProjects('all', this)">Semua</button>
+  <button class="filter-btn" onclick="filterProjects('web', this)">Web App</button>
+  <button class="filter-btn" onclick="filterProjects('mobile', this)">Mobile</button>
+  <button class="filter-btn" onclick="filterProjects('desktop', this)">Desktop</button>
+  <span class="project-count">Menampilkan <span id="count">3</span> proyek</span>
+</div>
+
+<!-- PROJECTS -->
+<div class="projects-wrap">
+  <div class="projects-grid" id="projects-grid">
+    <!-- CARD 1: Vape Store Website - Ecommerce -->
+    <div class="proj-card" data-cat="web">
+
+      <div class="project-image">
+        <img src="project_vapestroe_web.png" alt="Website Vape Store">
+      </div>
+      <div class="proj-info">
+        <div class="proj-meta-row">
+          <span class="proj-num">01 / 03</span>
+          <span class="proj-year">2026</span>
+        </div>
+
+        <div class="proj-tags">
+          <span class="tag tag-php">CodeIgniter 3</span>
+          <span class="tag tag-php">PHP</span>
+          <span class="tag tag-mysql">MySQL</span>
+          <span class="tag tag-js">JavaScript</span>
+          <span class="tag tag-tailwind">Bootstrap</span>
+        </div>
+
+        <div class="proj-title">
+          Vape Store E-Commerce — Website Desktop
+        </div>
+
+        <div class="proj-title-sub">
+          // desktop version · full stack web application
+        </div>
+
+        <p class="proj-desc">
+          Website e-commerce vape store berbasis desktop yang dikembangkan menggunakan
+          CodeIgniter 3 dengan arsitektur MVC. Sistem ini menyediakan fitur autentikasi
+          pengguna, katalog produk, pencarian produk, kategori, detail produk,
+          keranjang belanja, checkout, riwayat transaksi, manajemen stok, dashboard
+          admin, laporan penjualan, serta pengelolaan promo dan informasi. Tampilan
+          dibangun menggunakan Bootstrap agar responsif dan nyaman digunakan pada
+          perangkat desktop, sedangkan database menggunakan MySQL sebagai penyimpanan
+          seluruh data aplikasi.
+        </p>
+
+        <div class="proj-divider"></div>
+
+        <div class="proj-links-row">
+          <div class="proj-status">
+            <div class="status-dot live"></div>
+           Website Version
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- CARD 2: Vape Store Mobile - Ecommerce -->
+    <div class="proj-card" data-cat="mobile">
+      <div class="project-image">
+        <img src="project_vapestrore_mobile.png" alt="Mobile Vape Store">
+      </div>
+      <div class="proj-info">
+        <div class="proj-meta-row">
+          <span class="proj-num">02 / 03</span>
+          <span class="proj-year">2026</span>
+        </div>
+
+        <div class="proj-tags">
+          <span class="tag tag-dart">Dart</span>
+          <span class="tag tag-php">Flutter</span>
+          <span class="tag tag-mysql">MySQL</span>
+          <span class="tag tag-tailwind">REST API</span>
+        </div>
+
+        <div class="proj-title">Vape Store E-Commerce Mobile</div>
+
+        <div class="proj-title-sub">
+          // android application · mobile shopping app
+        </div>
+
+        <p class="proj-desc">
+          Aplikasi mobile Vape Store yang dikembangkan menggunakan Flutter dan Dart di Android Studio 
+          dengan integrasi REST API dan database MySQL. Aplikasi menyediakan fitur registrasi 
+          dan login pengguna, katalog produk, pencarian, kategori, detail produk, keranjang belanja, 
+          checkout, riwayat pesanan, promo, notifikasi, serta profil pengguna. 
+          Dirancang dengan antarmuka yang responsif dan mudah digunakan sehingga memberikan pengalaman 
+          berbelanja produk vape secara praktis melalui perangkat Android.
+        </p>
+
+        <div class="proj-divider"></div>
+
+        <div class="proj-links-row">
+          <div class="proj-status">
+            <div class="status-dot live"></div>
+            Android Version
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CARD 3: Vape Store Dekstop - Ecommerce -->
+    <div class="proj-card featured" data-cat="desktop">
+     <div class="project-image">
+        <img src="project_vapestrore_dekstop.png" alt="Dekstop Vape Store">
+      </div>
+      <div class="proj-info">
+        <div class="proj-meta-row">
+          <span class="proj-num">03 / 03</span>
+          <span class="proj-year">2026</span>
+        </div>
+
+        <div class="proj-tags">
+          <span class="tag tag-react">C#</span>
+          <span class="tag tag-node">Windows Forms</span>
+          <span class="tag tag-mysql">MySQL</span>
+          <span class="tag tag-js">.NET Framework</span>
+        </div>
+
+        <div class="proj-title">Vape Store E-Commerce Desktop</div>
+
+        <div class="proj-title-sub">
+          // desktop application · point of sales & management system
+        </div>
+
+        <p class="proj-desc">
+          Aplikasi desktop Vape Store yang dikembangkan menggunakan C# Windows Forms dan MySQL 
+          untuk membantu pengelolaan operasional toko. Sistem menyediakan fitur login admin, login pelanggan, 
+          manajemen produk, kategori, stok, data pelanggan, transaksi penjualan, pembayaran, 
+          pengelolaan promo, laporan penjualan, serta dashboard statistik. Aplikasi dirancang agar 
+          memudahkan proses administrasi toko dengan antarmuka yang sederhana, cepat, dan mudah digunakan.
+        </p>
+
+        <div class="proj-divider"></div>
+
+        <div class="proj-links-row">
+          <div class="proj-status">
+            <div class="status-dot live"></div>
+            Desktop Version
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end grid -->
+</div><!-- end projects-wrap -->
+
+<a href="index.html" class="back-btn">← Kembali ke Beranda</a>
+
+<footer>© 2026 Imam · RPL C · SMK N 2 Karanganyar · Dibuat dengan ❤️ & ☕</footer>
+
+<script>
+/* custom cursor */
+const cursor = document.getElementById('cursor');
+const ring = document.getElementById('cursor-ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; });
+(function tick(){
+  cursor.style.left=(mx-6)+'px'; cursor.style.top=(my-6)+'px';
+  rx+=(mx-rx)*0.12; ry+=(my-ry)*0.12;
+  ring.style.left=(rx-18)+'px'; ring.style.top=(ry-18)+'px';
+  requestAnimationFrame(tick);
+})();
+document.querySelectorAll('a,button,.proj-card').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{ cursor.style.transform='scale(2.5)'; ring.style.transform='scale(1.5)'; ring.style.opacity='0.3'; });
+  el.addEventListener('mouseleave',()=>{ cursor.style.transform='scale(1)'; ring.style.transform='scale(1)'; ring.style.opacity='0.5'; });
+});
+
+/* scroll reveal */
+const cards = document.querySelectorAll('.proj-card');
+const obs = new IntersectionObserver(entries => {
+  entries.forEach((e,i) => {
+    if(e.isIntersecting){
+      setTimeout(()=>e.target.classList.add('visible'), i*120);
+      obs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.08 });
+cards.forEach(c => obs.observe(c));
+
+/* filter */
+function filterProjects(cat, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  let visible = 0;
+  cards.forEach(card => {
+    const cats = card.dataset.cat || '';
+    const show = cat === 'all' || cats.includes(cat);
+    card.style.display = show ? '' : 'none';
+    if(show) visible++;
+  });
+  document.getElementById('count').textContent = visible;
+}
+</script>
+</body>
+</html>
